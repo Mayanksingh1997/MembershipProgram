@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: firstclub
+  docker:
+    compose:
+      file: docker/docker-compose.yml
+  jpa:
+    hibernate:
+      ddl-auto: update
