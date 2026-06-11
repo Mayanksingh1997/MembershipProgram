@@ -1,57 +1,60 @@
-# Firstclub
+# FirstClub Membership Program
 
-Spring Boot membership application.
+Backend service for FirstClub's tiered membership program.
+
+> **Demo data, users, passwords, cURL examples:** [DUMMYINFO.md](DUMMYINFO.md)  
+> **Full API contracts (success + failure):** [APICONTRACTS.md](APICONTRACTS.md)
 
 ## Prerequisites
 
 - **Java 21**
 - **Docker**
 
-## Steps to Run
+## Reset Database (after schema changes)(Do this to start mysql and phpmyadmin and make sure any Container management application like Rancher Desktop or Docker Desktop is configured, up and running)
 
-1. **Set the compile-time and runtime environment**
+```bash
+cd docker
+docker compose down -v
+docker compose up -d
+```
+## If `docker compose up` doesnot work, Do - export DOCKER_HOST=unix:///Users/mayank.nln/.rd/docker.sock (add your local address of docker.sock file)
 
-   Configure your IDE or shell to use Java 21 for both compilation and execution.
+## Run
 
-   ```bash
-   java -version
-   ```
+```bash
+mvn clean install
+./mvnw spring-boot:run
+```
 
-   Ensure the output shows Java 21.
+- Health: http://localhost:8080/actuator/health
+- Swagger: http://localhost:8080/swagger-ui/index.html
+- API-Docs(copy its content and import in postman): http://localhost:8080/v3/api-docs
 
-2. **Build the project**
+## Database configuration
 
-   From the project root:
+MySQL is the default database, configured via `application-mysql.yml` and `SPRING_PROFILES_ACTIVE=mysql`.
 
-   ```bash
-   mvn clean install
-   ```
+Env vars: `DB_NAME`, `DB_URL`, `DB_USER`, `DB_PASSWORD` — see [DUMMYINFO.md](DUMMYINFO.md).
 
-3. **Start MySQL and phpMyAdmin**
+The profile-based layout is ready for adding other databases later (new `application-<profile>.yml` + driver dependency) without changing services or repositories.
 
-   Navigate to the `docker` directory and start the containers:
+## Architecture
 
-   ```bash
-   cd docker
-   docker compose up
-   ```
+```
+controller → service (ResponseEntity) → JPA repository → DB (profile-selected)
+                ↓
+     YAML catalog (plans/tiers/benefits — internal config)
+     Strategy / State / Factory / Observer / Builder
+     JWT interceptor (cookie-based auth)
+```
 
-4. **Start the application**
+## Design Patterns
 
-   Run `FirstclubApplication.java`:
-
-   `src/main/java/com/firstclub/firstclub/FirstclubApplication.java`
-
-   You can start it from your IDE or from the project root:
-
-   ```bash
-   ./mvnw spring-boot:run
-   ```
-
-5. **Verify the health endpoint**
-
-   Open the following URL in your browser:
-
-   http://localhost:8080/actuator/health
-
-   If the application is running correctly, the health endpoint should respond successfully.
+| Pattern | Usage |
+|---------|-------|
+| **Strategy** | `TierEligibilityEvaluator` — order count, order value, cohort |
+| **State** | `MembershipState` — ACTIVE, CANCELLED, EXPIRED transitions |
+| **Factory** | `TierEvaluatorFactory`, `MembershipStateFactory` |
+| **Abstract Factory** | `MembershipDomainFactory` |
+| **Observer** | `MembershipEventPublisher` → `MembershipAuditListener` |
+| **Builder** | Lombok `@Builder` on entities and DTOs |

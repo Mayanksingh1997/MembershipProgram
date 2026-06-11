@@ -1,0 +1,70 @@
+membership:
+  catalog:
+    plans:
+      - code: MONTHLY
+        name: Monthly Plan
+        price: 99.00
+        duration-days: 30
+        active: true
+      - code: QUARTERLY
+        name: Quarterly Plan
+        price: 249.00
+        duration-days: 90
+        active: true
+      - code: YEARLY
+        name: Yearly Plan
+        price: 899.00
+        duration-days: 365
+        active: true
+    tiers:
+      - code: SILVER
+        display-name: Silver
+        rank: 1
+        active: true
+        discount-percent: ${membership.tier-discounts.silver-percent:5}
+        eligibility-rules:
+          - rule-type: ORDER_COUNT
+            operator: GTE
+            threshold-value: 0
+        benefits:
+          - code: FREE_DELIVERY
+            name: Free Delivery
+          - code: EXTRA_DISCOUNT
+            name: Extra Discount
+      - code: GOLD
+        display-name: Gold
+        rank: 2
+        active: true
+        discount-percent: ${membership.tier-discounts.gold-percent:10}
+        eligibility-rules:
+          - rule-type: ORDER_COUNT
+            operator: GTE
+            threshold-value: 10
+        benefits:
+          - code: FREE_DELIVERY
+            name: Free Delivery
+          - code: EXTRA_DISCOUNT
+            name: Extra Discount
+          - code: EXCLUSIVE_DEALS
+            name: Exclusive Deals Access
+      - code: PLATINUM
+        display-name: Platinum
+        rank: 3
+        active: true
+        discount-percent: ${membership.tier-discounts.platinum-percent:15}
+        eligibility-rules:
+          - rule-type: MONTHLY_ORDER_VALUE
+            operator: GTE
+            threshold-value: 5000
+          - rule-type: COHORT
+            operator: EQ
+            cohort-code: PREMIUM_COHORT
+        benefits:
+          - code: FREE_DELIVERY
+            name: Free Delivery
+          - code: EXTRA_DISCOUNT
+            name: Extra Discount
+          - code: EXCLUSIVE_DEALS
+            name: Exclusive Deals Access
+          - code: PRIORITY_SUPPORT
+            name: Priority Support
