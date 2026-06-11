@@ -1,0 +1,17 @@
+# MySQL datasource profile. To add another DB, create application-<profile>.yml
+# with its own driver, dialect, and flyway locations — services stay unchanged.
+spring:
+  config:
+    activate:
+      on-profile: mysql
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/${DB_NAME:firstclub}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true}
+    username: ${DB_USER:firstclub}
+    password: ${DB_PASSWORD:firstclub}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+  flyway:
+    locations: classpath:db/migration
